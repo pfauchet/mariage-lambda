@@ -62,3 +62,6 @@ typings/
 
 # Google private key
 privatekey.json
+
+# Packaged file
+*.zip

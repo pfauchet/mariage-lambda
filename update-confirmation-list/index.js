@@ -66,7 +66,9 @@ exports.handler = (event, context, callback) => {
           }
         });
       }
-      callback(null, response)
+      callback(null, {
+        status: "success"
+      })
     }
   });
 };
