@@ -44,6 +44,7 @@ exports.handler = (event, context, callback) => {
         let code = value[0];
         let surname = value[1];
         let name = value[2];
+        let status = value[3];
         console.log("code = " + code);
 
         /*
@@ -53,9 +54,10 @@ exports.handler = (event, context, callback) => {
           Item: {
             code: code,
             surname: surname,
-            name: name
+            name: name,
+            status: status
           },
-          TableName: 'CONFIRMATION_TABLE'
+          TableName: 'ATTENDANTS_TABLE'
         };
 
         docClient.put(insert_params, function (err, data) {
