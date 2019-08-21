@@ -10,8 +10,8 @@
   "license": "ISC",
   "dependencies": {
     "aws-sdk": "^2.510.0",
+    "damerau-levenshtein-js": "^1.1.5",
     "googleapis": "^40.0.1",
-    "js-levenshtein": "^1.1.6",
     "sha256": "^0.2.0",
     "uuid": "^3.3.2"
   }

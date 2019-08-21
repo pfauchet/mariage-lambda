@@ -4,84 +4,85 @@ var { google } = require("googleapis");
 let privatekey = require("./privatekey.json");
 
 let jwtClient = new google.auth.JWT(
-    privatekey.client_email,
-    null,
-    privatekey.private_key,
-    [
-      'https://www.googleapis.com/auth/spreadsheets'
-    ]
-  );
-  
-  //authenticate request
-  jwtClient.authorize(function (err, tokens) {
-    if (err) {
-      console.log(err);
-      return;
-    } else {
-      console.log("Successfully connected!");
-    }
-  });
+  privatekey.client_email,
+  null,
+  privatekey.private_key,
+  [
+    'https://www.googleapis.com/auth/spreadsheets'
+  ]
+);
+
+//authenticate request
+jwtClient.authorize(function (err, tokens) {
+  if (err) {
+    console.log(err);
+    return;
+  } else {
+    console.log("Successfully connected!");
+  }
+});
 
 exports.handler = function (event, context, callback) {
 
-    var params = {
-        TableName: 'CONFIRMATION_TABLE',
-        Key: {
-            "code": event.code
-        }
-    };
+  var params = {
+    TableName: 'CONFIRMATION_TABLE',
+    Key: {
+      "code": event.code
+    }
+  };
 
-    docClient.get(params, function (err, data) {
-        if (err) {
-            callback(Error(err), null);
-        } else {
-            let results = data.Item
-            if (results) {
-                if (results.token != event.token) {
-                    callback(Error("Token invalide."), null);
-                }
-                else {
-                    var values = [
-                        [
-                          results.name,
-                          results.surname,
-                          results.children,
-                          results.plusOne,
-                          event.isAttending,
-                          event.isWithPlusOne,
-                          event.isWithChildren
-                        ]
-                      ];
-                  
-                      let resource = {
-                        values,
-                      };
-                  
-                      let spreadsheetId = '1T404n9zgF7lclrglI9JeGIjsglI2jdjwBQoi85F1ruQ';
-                      let sheetName = 'Réponses!A2:Z1000';
-                      let sheets = google.sheets('v4');
-                      let valueInputOption = "RAW";
-                  
-                      sheets.spreadsheets.values.append({
-                        auth: jwtClient,
-                        spreadsheetId: spreadsheetId,
-                        range: sheetName,
-                        valueInputOption: valueInputOption,
-                        resource,
-                      }, (err, result) => {
-                        if (err) {
-                          callback(err, null)
-                        } else {
-                          callback(null, {
-                            status : "success"
-                          })
-                        }
-                      });
-                }
-            }
-            else {
-                callback(Error("Code invalide."), null);
-            }
+  docClient.get(params, function (err, data) {
+    if (err) {
+      callback(Error(err), null);
+    } else {
+      let results = data.Item
+      if (results) {
+        if (results.token != event.token) {
+          callback(Error("Token invalide."), null);
         }
-    });
+        else {
+          var values = [
+            [
+              results.name,
+              results.surname,
+              results.children,
+              results.plusOne,
+              event.isAttending,
+              event.isWithPlusOne,
+              event.isWithChildren,
+              new Date()
+            ]
+          ];
+
+          let resource = {
+            values,
+          };
+
+          let spreadsheetId = '1T404n9zgF7lclrglI9JeGIjsglI2jdjwBQoi85F1ruQ';
+          let sheetName = 'Réponses!A2:Z1000';
+          let sheets = google.sheets('v4');
+          let valueInputOption = "RAW";
+
+          sheets.spreadsheets.values.append({
+            auth: jwtClient,
+            spreadsheetId: spreadsheetId,
+            range: sheetName,
+            valueInputOption: valueInputOption,
+            resource,
+          }, (err, result) => {
+            if (err) {
+              callback(err, null)
+            } else {
+              callback(null, {
+                status: "success"
+              })
+            }
+          });
+        }
+      }
+      else {
+        callback(Error("Code invalide."), null);
+      }
+    }
+  });
 };

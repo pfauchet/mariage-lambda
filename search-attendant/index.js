@@ -1,6 +1,6 @@
 var { google } = require("googleapis");
 let privatekey = require("./privatekey.json");
-const levenshtein = require('js-levenshtein');
+const dl = require("damerau-levenshtein-js");
 const AWS = require('aws-sdk');
 const docClient = new AWS.DynamoDB.DocumentClient({ region: 'eu-west-3' });
 const uuidv4 = require('uuid/v4');
@@ -44,14 +44,14 @@ exports.handler = (event, context, callback) => {
       console.log('The API returned an error: ' + err);
     } else {
       let found = false;
-
+      
       for (let value of response.data.values) {
         let surname = value[1];
         let name = value[2];
         let plusOne = value[3];
         let children = value[4];
 
-        let distance = levenshtein(surname + name, event.surname + event.name);
+        let distance = dl.distance(surname.toLowerCase() + name.toLowerCase(), event.surname.toLowerCase() + event.name.toLowerCase());
 
         if (distance < 2) {
           console.log(distance);
