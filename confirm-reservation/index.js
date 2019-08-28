@@ -26,96 +26,104 @@ jwtClient.authorize(function (err, tokens) {
 });
 
 exports.handler = function (event, context, callback) {
-
-  var params = {
-    TableName: 'CONFIRMATION_TABLE',
-    Key: {
-      "code": event.code
-    }
-  };
-
-  docClient.get(params, function (err, data) {
-    if (err) {
-      callback(Error(err), null);
-    } else {
-      let results = data.Item
-      if (results) {
-        if (results.token != event.token) {
-          callback(Error("Token invalide."), null);
-        }
-        else {
-          var values = [
-            [
-              results.name,
-              results.surname,
-              results.children,
-              results.plusOne,
-              event.isAttending,
-              event.isWithPlusOne,
-              event.isWithChildren,
-              event.email,
-              new Date()
-            ]
-          ];
-
-          let resource = {
-            values,
-          };
-
-          let spreadsheetId = '1T404n9zgF7lclrglI9JeGIjsglI2jdjwBQoi85F1ruQ';
-          let sheetName = 'Réponses!A2:Z1000';
-          let sheets = google.sheets('v4');
-          let valueInputOption = "RAW";
-
-          sheets.spreadsheets.values.append({
-            auth: jwtClient,
-            spreadsheetId: spreadsheetId,
-            range: sheetName,
-            valueInputOption: valueInputOption,
-            resource,
-          }, (err, result) => {
-            if (err) {
-              callback(err, null)
-            } else {
-              //event.email = "fauchet.paul@gmail.com"
-              if (event.email) {
-                /*
-                * Envoi de l'email au compte
-                */
-                var eParams = {
-                  Destination: {
-                    ToAddresses: [event.email]
-                  },
-                  Message: {
-                    Body: {
-                      Text: {
-                        Data: "Au top, merci d'avoir répondu :)"
+  if (event.email && !validateEmail(event.email)) {
+    callback(Error("INVALID_EMAIL"), null);
+  }
+  else {
+    var params = {
+      TableName: 'CONFIRMATION_TABLE',
+      Key: {
+        "code": event.code
+      }
+    };
+  
+    docClient.get(params, function (err, data) {
+      if (err) {
+        callback(Error(err), null);
+      } else {
+        let results = data.Item
+        if (results) {
+          if (results.token != event.token) {
+            callback(Error("INVALID_TOKEN"), null);
+          }
+          else {
+            var values = [
+              [
+                results.name,
+                results.surname,
+                results.children,
+                results.plusOne,
+                event.isAttending,
+                event.isWithPlusOne,
+                event.isWithChildren,
+                event.email,
+                new Date()
+              ]
+            ];
+  
+            let resource = {
+              values,
+            };
+  
+            let spreadsheetId = '1T404n9zgF7lclrglI9JeGIjsglI2jdjwBQoi85F1ruQ';
+            let sheetName = 'Réponses!A2:Z1000';
+            let sheets = google.sheets('v4');
+            let valueInputOption = "RAW";
+  
+            sheets.spreadsheets.values.append({
+              auth: jwtClient,
+              spreadsheetId: spreadsheetId,
+              range: sheetName,
+              valueInputOption: valueInputOption,
+              resource,
+            }, (err, result) => {
+              if (err) {
+                callback(err, null)
+              } else {
+                if (event.email) {
+                  /*
+                  * Envoi de l'email au compte
+                  */
+                  var eParams = {
+                    Destination: {
+                      ToAddresses: [event.email]
+                    },
+                    Message: {
+                      Body: {
+                        Text: {
+                          Data: "Au top, merci d'avoir répondu :)"
+                        }
+                      },
+                      Subject: {
+                        Data: "[Lydia & Paul 2020] Confirmation de votre venue"
                       }
                     },
-                    Subject: {
-                      Data: "[Lydia & Paul 2020] Confirmation de votre venue"
-                    }
-                  },
-                  Source: "fauchet.paul@gmail.com"
-                };
-
-                ses.sendEmail(eParams, function (err, data) {
-                  if (err)
-                    console.log(err);
-                  else
-                    console.log("email sent to : " + event.email);
-                });
+                    Source: "fauchet.paul@gmail.com"
+                  };
+  
+                  ses.sendEmail(eParams, function (err, data) {
+                    if (err)
+                      console.log(err);
+                    else
+                      console.log("email sent to : " + event.email);
+                  });
+                }
+                callback(null, {
+                  status: "success"
+                })
               }
-              callback(null, {
-                status: "success"
-              })
-            }
-          });
+            });
+          }
+        }
+        else {
+          callback(Error("INVALID_CODE"), null);
         }
       }
-      else {
-        callback(Error("Code invalide."), null);
-      }
-    }
-  });
+    });
+  }
 };
+
+function validateEmail(email) {
+  var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  return re.test(String(email).toLowerCase());
+}

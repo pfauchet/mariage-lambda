@@ -51,7 +51,7 @@ exports.handler = (event, context, callback) => {
         let plusOne = value[3];
         let children = value[4];
 
-        let distance = dl.distance(surname.toLowerCase() + name.toLowerCase(), event.surname.toLowerCase() + event.name.toLowerCase());
+        let distance = dl.distance(surname.toLowerCase() + name.toLowerCase(), event.surname.toLowerCase().trim() + event.name.toLowerCase().trim());
 
         if (distance < 2) {
           console.log(distance);
