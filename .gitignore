@@ -65,3 +65,6 @@ privatekey.json
 
 # Packaged file
 *.zip
+
+# Facebook Tokens
+credentials.json
