@@ -1,5 +1,8 @@
 const AWS = require('aws-sdk');
 const docClient = new AWS.DynamoDB.DocumentClient({ region: 'eu-west-3' });
+const ses = new AWS.SES({
+  region: 'eu-west-1'
+});
 var { google } = require("googleapis");
 let privatekey = require("./privatekey.json");
 
@@ -50,6 +53,7 @@ exports.handler = function (event, context, callback) {
               event.isAttending,
               event.isWithPlusOne,
               event.isWithChildren,
+              event.email,
               new Date()
             ]
           ];
@@ -73,6 +77,35 @@ exports.handler = function (event, context, callback) {
             if (err) {
               callback(err, null)
             } else {
+              //event.email = "fauchet.paul@gmail.com"
+              if (event.email) {
+                /*
+                * Envoi de l'email au compte
+                */
+                var eParams = {
+                  Destination: {
+                    ToAddresses: [event.email]
+                  },
+                  Message: {
+                    Body: {
+                      Text: {
+                        Data: "Au top, merci d'avoir répondu :)"
+                      }
+                    },
+                    Subject: {
+                      Data: "[Lydia & Paul 2020] Confirmation de votre venue"
+                    }
+                  },
+                  Source: "fauchet.paul@gmail.com"
+                };
+
+                ses.sendEmail(eParams, function (err, data) {
+                  if (err)
+                    console.log(err);
+                  else
+                    console.log("email sent to : " + event.email);
+                });
+              }
               callback(null, {
                 status: "success"
               })
