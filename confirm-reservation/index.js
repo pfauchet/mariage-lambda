@@ -26,7 +26,10 @@ jwtClient.authorize(function (err, tokens) {
 });
 
 exports.handler = function (event, context, callback) {
-  if (event.email && !validateEmail(event.email)) {
+  if (!event.email || (event.isWithChildren && !event.nbChildren)){
+    callback(Error("MISSING_PARAMETER"), null);
+  }
+  else if (!validateEmail(event.email)) {
     callback(Error("INVALID_EMAIL"), null);
   }
   else {
@@ -56,7 +59,10 @@ exports.handler = function (event, context, callback) {
                 event.isAttending,
                 event.isWithPlusOne,
                 event.isWithChildren,
-                event.email,
+                event.nbChildren,
+                event.needsBabySitter,
+                event.needsDriver,
+                event.email.toLowerCase(),
                 new Date()
               ]
             ];
@@ -91,7 +97,7 @@ exports.handler = function (event, context, callback) {
                     Message: {
                       Body: {
                         Text: {
-                          Data: "Au top, merci d'avoir répondu :)"
+                          Data: "Merci d'avoir confirmé votre présence !"
                         }
                       },
                       Subject: {

@@ -63,8 +63,10 @@ exports.handler = (event, context, callback) => {
           * Création de l'objet dans DynamoDB
           */
           if (!plusOne) {
-            plusOne = null
+            plusOne = null;
           }
+
+          var milliseconds = Math.floor((new Date).getTime() / 1000);
 
           var insert_params = {
             Item: {
@@ -73,7 +75,8 @@ exports.handler = (event, context, callback) => {
               name: name,
               plusOne: plusOne,
               children: children,
-              token: token
+              token: token,
+              ttl: milliseconds + 10 * 60
             },
             TableName: 'CONFIRMATION_TABLE'
           };
