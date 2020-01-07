@@ -86,34 +86,34 @@ exports.handler = function (event, context, callback) {
               if (err) {
                 callback(err, null)
               } else {
-                if (event.email) {
-                  /*
-                  * Envoi de l'email au compte
-                  */
-                  var eParams = {
-                    Destination: {
-                      ToAddresses: [event.email]
-                    },
-                    Message: {
-                      Body: {
-                        Text: {
-                          Data: "Merci d'avoir confirmé votre présence !"
-                        }
-                      },
-                      Subject: {
-                        Data: "[Lydia & Paul 2020] Confirmation de votre venue"
-                      }
-                    },
-                    Source: "fauchet.paul@gmail.com"
-                  };
+                // if (event.email) {
+                //   /*
+                //   * Envoi de l'email au compte
+                //   */
+                //   var eParams = {
+                //     Destination: {
+                //       ToAddresses: [event.email]
+                //     },
+                //     Message: {
+                //       Body: {
+                //         Text: {
+                //           Data: "Merci d'avoir confirmé votre présence !"
+                //         }
+                //       },
+                //       Subject: {
+                //         Data: "[Lydia & Paul 2020] Confirmation de votre venue"
+                //       }
+                //     },
+                //     Source: "fauchet.paul@gmail.com"
+                //   };
   
-                  ses.sendEmail(eParams, function (err, data) {
-                    if (err)
-                      console.log(err);
-                    else
-                      console.log("email sent to : " + event.email);
-                  });
-                }
+                //   ses.sendEmail(eParams, function (err, data) {
+                //     if (err)
+                //       console.log(err);
+                //     else
+                //       console.log("email sent to : " + event.email);
+                //   });
+                // }
                 callback(null, {
                   status: "success"
                 })
