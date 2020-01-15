@@ -26,7 +26,7 @@ jwtClient.authorize(function (err, tokens) {
 });
 
 exports.handler = function (event, context, callback) {
-  if (!event.email || (event.isWithChildren && !event.nbChildren)){
+  if (!event.email || (event.isWithChildren && !event.nbChildren)) {
     callback(Error("MISSING_PARAMETER"), null);
   }
   else if (!validateEmail(event.email)) {
@@ -39,7 +39,7 @@ exports.handler = function (event, context, callback) {
         "code": event.code
       }
     };
-  
+
     docClient.get(params, function (err, data) {
       if (err) {
         callback(Error(err), null);
@@ -66,16 +66,16 @@ exports.handler = function (event, context, callback) {
                 new Date()
               ]
             ];
-  
+
             let resource = {
               values,
             };
-  
+
             let spreadsheetId = '1T404n9zgF7lclrglI9JeGIjsglI2jdjwBQoi85F1ruQ';
             let sheetName = 'Réponses!A2:Z1000';
             let sheets = google.sheets('v4');
             let valueInputOption = "RAW";
-  
+
             sheets.spreadsheets.values.append({
               auth: jwtClient,
               spreadsheetId: spreadsheetId,
@@ -86,34 +86,34 @@ exports.handler = function (event, context, callback) {
               if (err) {
                 callback(err, null)
               } else {
-                // if (event.email) {
-                //   /*
-                //   * Envoi de l'email au compte
-                //   */
-                //   var eParams = {
-                //     Destination: {
-                //       ToAddresses: [event.email]
-                //     },
-                //     Message: {
-                //       Body: {
-                //         Text: {
-                //           Data: "Merci d'avoir confirmé votre présence !"
-                //         }
-                //       },
-                //       Subject: {
-                //         Data: "[Lydia & Paul 2020] Confirmation de votre venue"
-                //       }
-                //     },
-                //     Source: "fauchet.paul@gmail.com"
-                //   };
-  
-                //   ses.sendEmail(eParams, function (err, data) {
-                //     if (err)
-                //       console.log(err);
-                //     else
-                //       console.log("email sent to : " + event.email);
-                //   });
-                // }
+                /*
+                * Envoi de l'email au compte
+                */
+                var eParams = {
+                  Destination: {
+                    ToAddresses: ["fauchet.paul@gmail.com"]
+                  },
+                  Message: {
+                    Body: {
+                      Html: {
+                        Charset: "UTF-8", 
+                        Data: results.surname + " " + results.name + " vient de répondre sur le site internet"
+                      }
+                    },
+                    Subject: {
+                      Data: "[Organisation Mariage] Nouvelle confirmation de présence !"
+                    }
+                  },
+                  Source: "fauchet.paul@gmail.com"
+                };
+
+                ses.sendEmail(eParams, function (err, data) {
+                  if (err)
+                    console.log(err);
+                  else
+                    console.log("email sent to : " + event.email);
+                });
+
                 callback(null, {
                   status: "success"
                 })
