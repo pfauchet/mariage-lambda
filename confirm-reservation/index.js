@@ -91,7 +91,7 @@ exports.handler = function (event, context, callback) {
                 */
                 var eParams = {
                   Destination: {
-                    ToAddresses: ["fauchet.paul@gmail.com"]
+                    ToAddresses: ["contact@lydiaetpaul2020.fr"]
                   },
                   Message: {
                     Body: {
@@ -104,7 +104,7 @@ exports.handler = function (event, context, callback) {
                       Data: "[Organisation Mariage] Nouvelle confirmation de présence !"
                     }
                   },
-                  Source: "fauchet.paul@gmail.com"
+                  Source: "contact@lydiaetpaul2020.fr"
                 };
 
                 ses.sendEmail(eParams, function (err, data) {
