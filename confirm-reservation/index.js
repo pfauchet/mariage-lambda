@@ -54,6 +54,7 @@ exports.handler = function (event, context, callback) {
               [
                 results.name,
                 results.surname,
+                results.surname + ' ' + results.name,
                 results.children,
                 results.plusOne,
                 event.isAttending,
