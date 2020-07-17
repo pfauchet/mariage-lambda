@@ -6,6 +6,11 @@ const ses = new AWS.SES({
 var { google } = require("googleapis");
 let privatekey = require("./privatekey.json");
 
+var message_template = "%PRENOM% %NOM% vient de %DECISION% sur le site internet"
+
+var decision_true = "confirmer sa présence"
+var decision_false = "répondre qu'il/elle ne viendra pas"
+
 let jwtClient = new google.auth.JWT(
   privatekey.client_email,
   null,
@@ -90,6 +95,15 @@ exports.handler = function (event, context, callback) {
                 /*
                 * Envoi de l'email au compte
                 */
+
+                var message = message_template;
+                message = message.replace(/%NOM%/, results.name)
+                message = message.replace(/%PRENOM%/, results.surname)
+                if (event.isAttending)
+                  message = message.replace(/%DECISION%/, decision_true)
+                else
+                  message = message.replace(/%DECISION%/, decision_false)
+
                 var eParams = {
                   Destination: {
                     ToAddresses: ["contact@lydiaetpaul2020.fr"]
@@ -97,8 +111,8 @@ exports.handler = function (event, context, callback) {
                   Message: {
                     Body: {
                       Html: {
-                        Charset: "UTF-8", 
-                        Data: results.surname + " " + results.name + " vient de répondre sur le site internet"
+                        Charset: "UTF-8",
+                        Data: message
                       }
                     },
                     Subject: {
