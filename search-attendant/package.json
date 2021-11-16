@@ -9,7 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "aws-sdk": "^2.510.0",
+    "aws-sdk": "^2.814.0",
     "damerau-levenshtein-js": "^1.1.5",
     "googleapis": "^40.0.1",
     "sha256": "^0.2.0",
